@@ -59,6 +59,8 @@ app.use(function (req, res, next) {
       } else {
         res.redirect(req.path + '/');
       }
+    } else {
+      next();
     }
   });
 });
