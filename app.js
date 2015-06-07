@@ -2,6 +2,7 @@ var express = require('express');
 var fs = require('fs');
 var jade = require('jade');
 var ejs = require('ejs');
+var coffee = require('coffee-script');
 
 var app = express();
 
@@ -17,12 +18,16 @@ var indexes = [
 var renders = {};
 
 renders['.jade'] = function (data) {
-  var fn = jade.compile(data, {});
+  var fn = jade.compile(data, {pretty: '\t'});
   return fn({});
 };
 
 renders['.ejs'] = function (data) {
   return ejs.compile(data)();
+};
+
+renders['.coffee'] = function (data) {
+  return coffee.compile(data);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +72,7 @@ app.use(function (req, res, next) {
 
 // render
 app.use(function (req, res, next) {
-  ext = req.path.match(/\.[a-zA-Z0-9]+$/)[0];
+  var ext = req.path.match(/\.[a-zA-Z0-9]+$/)[0];
   if (renders[ext]) {
     var path = __dirname + '/public' + req.path;
     fs.readFile(path, "utf-8", function (err, data) {
